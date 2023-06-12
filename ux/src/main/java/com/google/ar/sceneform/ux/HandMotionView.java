@@ -14,7 +14,6 @@
  */
 package com.google.ar.sceneform.ux;
 
-import android.app.Activity;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
@@ -22,7 +21,6 @@ import android.view.animation.Animation;
 import android.widget.FrameLayout;
 
 import androidx.appcompat.widget.AppCompatImageView;
-
 
 /**
  * This view contains the hand motion instructions with animation.
@@ -45,7 +43,7 @@ public class HandMotionView extends AppCompatImageView {
 
         clearAnimation();
 
-        FrameLayout container = ((Activity) getContext()).findViewById(R.id.handMotionLayout);
+        FrameLayout container = ParentExtKt.getParentViewGroup(this);
 
         animation = new HandMotionAnimation(container, this);
         animation.setRepeatCount(Animation.INFINITE);
