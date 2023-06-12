@@ -55,7 +55,7 @@ dependencies {
     api "com.google.android.filament:filament-utils-android:1.21.1"
 
     // ARCore
-    api "com.google.ar:core:1.31.0"
+    api "com.google.ar:core:1.37.0"
 
     // AndroidX
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.6.1"
