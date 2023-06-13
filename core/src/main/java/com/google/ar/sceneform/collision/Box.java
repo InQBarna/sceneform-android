@@ -8,6 +8,9 @@ import com.google.ar.sceneform.math.Quaternion;
 import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.utilities.Preconditions;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Mathematical representation of a box. Used to perform intersection and collision tests against
  * oriented boxes.
@@ -149,6 +152,9 @@ public class Box extends CollisionShape {
     Vector3 max = getExtents();
     Vector3 min = max.negated();
 
+    final Logger logger = LoggerFactory.getLogger("Instersect");
+    logger.debug("Testing interception of ray {} (with box center {}, extents {})", ray, center, max);
+
     // tMin is the farthest "near" intersection (amongst the X,Y and Z planes pairs)
     float tMin = Float.MIN_VALUE;
 
@@ -162,6 +168,7 @@ public class Box extends CollisionShape {
     Vector3 axis = new Vector3(axes[0], axes[1], axes[2]);
     float e = Vector3.dot(axis, delta);
     float f = Vector3.dot(rayDirection, axis);
+    logger.debug("Axis = {}, delta = {}, θ(Axis, delta) = {}, θ(RDir, Axis) = {}", axis, delta, Math.acos(e), Math.acos(f));
 
     if (!MathHelper.almostEqualRelativeAndAbs(f, 0.0f)) {
       float t1 = (e + min.x) / f;
@@ -177,10 +184,12 @@ public class Box extends CollisionShape {
       tMin = Math.max(t1, tMin);
 
       if (tMax < tMin) {
+        logger.debug("Not intersection with planes YZ (tMax = {}, tMin = {})", tMax, tMin);
         return false;
       }
     } else if (-e + min.x > 0.0f || -e + max.x < 0.0f) {
       // Ray is almost parallel to one of the planes.
+      logger.debug("Almost parallel to plan Y or Z");
       return false;
     }
 
@@ -188,6 +197,7 @@ public class Box extends CollisionShape {
     axis = new Vector3(axes[4], axes[5], axes[6]);
     e = Vector3.dot(axis, delta);
     f = Vector3.dot(rayDirection, axis);
+    logger.debug("Axis = {}, delta = {}, θ(Axis, delta) = {}, θ(RDir, Axis) = {}", axis, delta, Math.acos(e), Math.acos(f));
 
     if (!MathHelper.almostEqualRelativeAndAbs(f, 0.0f)) {
       float t1 = (e + min.y) / f;
@@ -203,10 +213,12 @@ public class Box extends CollisionShape {
       tMin = Math.max(t1, tMin);
 
       if (tMax < tMin) {
+        logger.debug("Not intersection with planes XZ (tMax = {}, tMin = {})", tMax, tMin);
         return false;
       }
     } else if (-e + min.y > 0.0f || -e + max.y < 0.0f) {
       // Ray is almost parallel to one of the planes.
+      logger.debug("Almost parallel to plan X or Z");
       return false;
     }
 
@@ -214,6 +226,7 @@ public class Box extends CollisionShape {
     axis = new Vector3(axes[8], axes[9], axes[10]);
     e = Vector3.dot(axis, delta);
     f = Vector3.dot(rayDirection, axis);
+    logger.debug("Axis = {}, delta = {}, θ(Axis, delta) = {}, θ(RDir, Axis) = {}", axis, delta, Math.acos(e), Math.acos(f));
 
     if (!MathHelper.almostEqualRelativeAndAbs(f, 0.0f)) {
       float t1 = (e + min.z) / f;
@@ -229,12 +242,16 @@ public class Box extends CollisionShape {
       tMin = Math.max(t1, tMin);
 
       if (tMax < tMin) {
+        logger.debug("Not intersection with planes XY (tMax = {}, tMin = {})", tMax, tMin);
         return false;
       }
     } else if (-e + min.z > 0.0f || -e + max.z < 0.0f) {
       // Ray is almost parallel to one of the planes.
+      logger.debug("Almost parallel to plan Y or X");
       return false;
     }
+
+    logger.info("Got hit at distance: {}", tMin);
 
     result.setDistance(tMin);
     result.setPoint(ray.getPoint(result.getDistance()));

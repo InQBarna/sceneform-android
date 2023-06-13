@@ -53,6 +53,7 @@ dependencies {
     api "com.google.android.filament:filament-android:1.21.1"
     api "com.google.android.filament:gltfio-android:1.21.1"
     api "com.google.android.filament:filament-utils-android:1.21.1"
+    api "org.slf4j:slf4j-api:1.7.25"
 
     // ARCore
     api "com.google.ar:core:1.37.0"

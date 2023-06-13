@@ -6,6 +6,9 @@ import com.google.ar.sceneform.Node;
 import com.google.ar.sceneform.common.TransformProvider;
 import com.google.ar.sceneform.utilities.Preconditions;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.function.BiConsumer;
@@ -73,7 +76,9 @@ public class CollisionSystem {
         int hitCount = 0;
 
         // Check the ray against all the colliders.
+        final Logger logger = LoggerFactory.getLogger("Instersect");
         for (Collider collider : colliders) {
+            logger.debug("Transform provider => {}", collider.getTransformProvider());
             CollisionShape collisionShape = collider.getTransformedShape();
             if (collisionShape == null) {
                 continue;
