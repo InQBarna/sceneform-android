@@ -249,10 +249,14 @@ public abstract class BaseArFragment extends Fragment
     @Override
     public void onResume() {
         super.onResume();
+        tryInitializeSession();
+        resume();
+    }
+
+    private void tryInitializeSession() {
         if (isArRequired() && arSceneView.getSession() == null) {
             initializeSession();
         }
-        resume();
     }
 
     public void resume() {
@@ -403,6 +407,8 @@ public abstract class BaseArFragment extends Fragment
                                                 }
                                             })
                                     .show();
+                        } else {
+                            tryInitializeSession();
                         }
                     } else {
                         // If any other user defined permission is not
