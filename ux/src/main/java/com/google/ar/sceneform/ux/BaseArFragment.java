@@ -94,6 +94,8 @@ public abstract class BaseArFragment extends Fragment
     @Nullable
     private OnAugmentedFaceUpdateListener onAugmentedFaceUpdateListener;
 
+    protected boolean addPeekListener = true;
+
     /**
      * Gets the ArSceneView for this fragment.
      */
@@ -213,7 +215,10 @@ public abstract class BaseArFragment extends Fragment
                             }
                         });
 
-        arSceneView.getScene().addOnPeekTouchListener(this);
+        if (addPeekListener) {
+            arSceneView.getScene().addOnPeekTouchListener(this);
+        }
+
         arSceneView.getScene().addOnUpdateListener(this);
 
         if (isArRequired()) {
