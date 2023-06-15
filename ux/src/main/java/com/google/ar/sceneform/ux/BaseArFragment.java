@@ -96,6 +96,7 @@ public abstract class BaseArFragment extends Fragment
     private OnAugmentedFaceUpdateListener onAugmentedFaceUpdateListener;
 
     protected boolean addPeekListener = true;
+    private ActivityResultLauncher<String[]> requestMultiplePermissions;
 
     /**
      * Gets the ArSceneView for this fragment.
@@ -187,6 +188,59 @@ public abstract class BaseArFragment extends Fragment
 
     protected void removeContent(View child) {
         frameLayout.removeView(child);
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        requestMultiplePermissions = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), results -> {
+            results.forEach((key, value) -> {
+                if (key.equals(Manifest.permission.CAMERA)) {
+                    if (!value) {
+                        AlertDialog.Builder builder;
+                        builder =
+                                new AlertDialog.Builder(requireActivity(), android.R.style.Theme_Material_Dialog_Alert);
+
+                        builder
+                                .setTitle(R.string.sceneform_camera_permission_required)
+                                .setMessage(R.string.sceneform_add_camera_permission_via_settings)
+                                .setPositiveButton(
+                                        android.R.string.ok,
+                                        (dialog, which) -> {
+                                            // If Ok was hit, bring up the Settings app.
+                                            Intent intent = new Intent();
+                                            intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                            intent.setData(Uri.fromParts("package", requireActivity().getPackageName(), null));
+                                            requireActivity().startActivity(intent);
+                                            // When the user closes the Settings app, allow the app to resume.
+                                            // Allow the app to ask for permissions again now.
+                                            setCanRequestDangerousPermissions(true);
+                                        })
+                                .setNegativeButton(android.R.string.cancel, null)
+                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                .setOnDismissListener(
+                                        arg0 -> {
+                                            // canRequestDangerousPermissions will be true if "OK" was selected from the dialog,
+                                            // false otherwise.  If "OK" was selected do nothing on dismiss, the app will
+                                            // continue and may ask for permission again if needed.
+                                            // If anything else happened, finish the activity when this dialog is
+                                            // dismissed.
+                                            if (!getCanRequestDangerousPermissions()) {
+                                                requireActivity().finish();
+                                            }
+                                        })
+                                .show();
+                    } else {
+                        tryInitializeSession();
+                    }
+                } else {
+                    // If any other user defined permission is not
+                    // granted, finish the Activity.
+                    if (!value)
+                        requireActivity().finish();
+                }
+            });
+        });
     }
 
     @Override
@@ -381,55 +435,6 @@ public abstract class BaseArFragment extends Fragment
         }
 
         if (!permissions.isEmpty()) {
-            ActivityResultLauncher<String[]> requestMultiplePermissions = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), results -> {
-                results.forEach((key, value) -> {
-                    if (key.equals(Manifest.permission.CAMERA)) {
-                        if (!value) {
-                            AlertDialog.Builder builder;
-                            builder =
-                                    new AlertDialog.Builder(requireActivity(), android.R.style.Theme_Material_Dialog_Alert);
-
-                            builder
-                                    .setTitle(R.string.sceneform_camera_permission_required)
-                                    .setMessage(R.string.sceneform_add_camera_permission_via_settings)
-                                    .setPositiveButton(
-                                            android.R.string.ok,
-                                            (dialog, which) -> {
-                                                // If Ok was hit, bring up the Settings app.
-                                                Intent intent = new Intent();
-                                                intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                                                intent.setData(Uri.fromParts("package", requireActivity().getPackageName(), null));
-                                                requireActivity().startActivity(intent);
-                                                // When the user closes the Settings app, allow the app to resume.
-                                                // Allow the app to ask for permissions again now.
-                                                setCanRequestDangerousPermissions(true);
-                                            })
-                                    .setNegativeButton(android.R.string.cancel, null)
-                                    .setIcon(android.R.drawable.ic_dialog_alert)
-                                    .setOnDismissListener(
-                                            arg0 -> {
-                                                // canRequestDangerousPermissions will be true if "OK" was selected from the dialog,
-                                                // false otherwise.  If "OK" was selected do nothing on dismiss, the app will
-                                                // continue and may ask for permission again if needed.
-                                                // If anything else happened, finish the activity when this dialog is
-                                                // dismissed.
-                                                if (!getCanRequestDangerousPermissions()) {
-                                                    requireActivity().finish();
-                                                }
-                                            })
-                                    .show();
-                        } else {
-                            tryInitializeSession();
-                        }
-                    } else {
-                        // If any other user defined permission is not
-                        // granted, finish the Activity.
-                        if (!value)
-                            requireActivity().finish();
-                    }
-                });
-            });
-
             // Request the permissions
             requestMultiplePermissions.launch(permissions.toArray(new String[0]));
         }
