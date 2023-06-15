@@ -60,6 +60,7 @@ import com.gorisse.thomas.sceneform.light.LightEstimationConfig;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * The AR fragment brings in the required view layout and controllers for common AR features.
@@ -176,6 +177,16 @@ public abstract class BaseArFragment extends Fragment
      */
     public void setOnAugmentedFaceUpdateListener(@Nullable OnAugmentedFaceUpdateListener listener) {
         this.onAugmentedFaceUpdateListener = listener;
+    }
+
+    protected void addContent(View child, Consumer<ViewGroup.MarginLayoutParams> setupLayoutParams) {
+        final FrameLayout.LayoutParams layoutParams = frameLayout.generateLayoutParams(null);
+        setupLayoutParams.accept(layoutParams);
+        frameLayout.addView(child, layoutParams);
+    }
+
+    protected void removeContent(View child) {
+        frameLayout.removeView(child);
     }
 
     @Override
