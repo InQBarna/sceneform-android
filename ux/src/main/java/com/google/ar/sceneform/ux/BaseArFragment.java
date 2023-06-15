@@ -2,8 +2,6 @@ package com.google.ar.sceneform.ux;
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -60,7 +58,6 @@ import com.gorisse.thomas.sceneform.light.LightEstimationConfig;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 /**
  * The AR fragment brings in the required view layout and controllers for common AR features.
@@ -78,18 +75,20 @@ public abstract class BaseArFragment extends Fragment
     private InstructionsController instructionsController;
     private TransformationSystem transformationSystem;
     private GestureDetector gestureDetector;
-    private FrameLayout frameLayout;
-    private boolean isStarted;
-    private boolean canRequestDangerousPermissions = true;
-    private boolean fullscreen = true;
+
+
+    private       FrameLayout                    frameLayout;
+    private       boolean                        isStarted;
+    private       boolean                        canRequestDangerousPermissions = true;
+    private       boolean                        fullscreen = true;
     @SuppressWarnings({"initialization"})
-    private final OnWindowFocusChangeListener onFocusListener =
+    private final OnWindowFocusChangeListener    onFocusListener =
             (hasFocus -> onWindowFocusChanged(hasFocus));
-    private boolean isAugmentedImageDatabaseEnabled = true;
+    private       boolean                        isAugmentedImageDatabaseEnabled = true;
     @Nullable
-    private OnSessionConfigurationListener onSessionConfigurationListener;
+    private       OnSessionConfigurationListener onSessionConfigurationListener;
     @Nullable
-    private OnTapArPlaneListener onTapArPlaneListener;
+    private       OnTapArPlaneListener           onTapArPlaneListener;
     @Nullable
     private OnAugmentedImageUpdateListener onAugmentedImageUpdateListener;
     @Nullable
@@ -103,6 +102,10 @@ public abstract class BaseArFragment extends Fragment
      */
     public ArSceneView getArSceneView() {
         return arSceneView;
+    }
+
+    protected FrameLayout getContentFrame() {
+        return frameLayout;
     }
 
     /**
@@ -178,16 +181,6 @@ public abstract class BaseArFragment extends Fragment
      */
     public void setOnAugmentedFaceUpdateListener(@Nullable OnAugmentedFaceUpdateListener listener) {
         this.onAugmentedFaceUpdateListener = listener;
-    }
-
-    protected void addContent(View child, Consumer<FrameLayout.LayoutParams> setupLayoutParams) {
-        final FrameLayout.LayoutParams layoutParams = frameLayout.generateLayoutParams(null);
-        setupLayoutParams.accept(layoutParams);
-        frameLayout.addView(child, layoutParams);
-    }
-
-    protected void removeContent(View child) {
-        frameLayout.removeView(child);
     }
 
     @Override
