@@ -179,7 +179,7 @@ public abstract class BaseArFragment extends Fragment
         this.onAugmentedFaceUpdateListener = listener;
     }
 
-    protected void addContent(View child, Consumer<ViewGroup.MarginLayoutParams> setupLayoutParams) {
+    protected void addContent(View child, Consumer<ViewGroup.LayoutParams> setupLayoutParams) {
         final FrameLayout.LayoutParams layoutParams = frameLayout.generateLayoutParams(null);
         setupLayoutParams.accept(layoutParams);
         frameLayout.addView(child, layoutParams);
